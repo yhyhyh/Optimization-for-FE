@@ -1,5 +1,4 @@
 % read data
-% path = 'D:/var/Google Drive/ORIE 5370 Optimization in Finance/Homework/hw1/';
 Prices = xlsread('weekly_spdr.xlsx','price','','');
 Prices = Prices(:,2:end);
 % parameter initialization
