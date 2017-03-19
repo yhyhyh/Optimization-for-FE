@@ -1,4 +1,4 @@
-##############################
+#################################
 # set external paramters
 
 path = "D:/CodeHub/R/CVAR"
@@ -8,6 +8,7 @@ num.sim = 1000
 window.len = 500
 rebalance.len = 50
 set.seed(5370)
+#################################
 
 library(MASS)
 library(mnormt)
