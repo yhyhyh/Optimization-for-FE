@@ -41,12 +41,14 @@ function  multi_period
                 horizon,sample_frequency,number_of_samples,rate_of_decay);
         mu0 = (1+.01*risk_free_rate(trade_date-1))^(horizon/52) - 1;
 
-        scenario = xlsread('scenario.xlsx');
+        nearest = floor(trade_date/50)*50;
+        strcat(num2str(nearest),'.csv')
+        scenario = csvread(strcat(num2str(nearest),'.csv'),1,1);
         mu = sum(scenario)/size(scenario,1);
 
         xx0 = x0;
         xx = x;
-        [x0,x] = optimize_cvar(mu0,mu,V,xx0,xx,trans_cost);
+        [x0,x] = optimize_cvar(mu0,mu,V,xx0,xx,trans_cost,0);
         wealth = wealth*(x0 + sum(x));
 
         total = x0 + sum(x);	
@@ -128,5 +130,9 @@ function  multi_period
     plot(hist_benchmark);
     hold on
     plot(hist_mvo);
+    
+    std(price2ret(hist_cvar))
+    std(price2ret(hist_benchmark))
+    std(price2ret(hist_mvo))
 
 end
