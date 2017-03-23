@@ -1,4 +1,16 @@
-#################################
+#############################################################################
+# Name: fit and simulate multivariate t distribution
+# Function: fit historical return data as multivariate t distribution
+#			generate return scenarios by aggregating simulated weekly return
+#
+#Input:
+#	SPDR.csv: price dataframe
+#
+#Output:
+#	$number of date$.csv: scenario matrix
+#	produce a sequence of csv file named after the days from starting date
+#
+#############################################################################
 # set external paramters
 
 path = "D:/CodeHub/R/CVAR"
