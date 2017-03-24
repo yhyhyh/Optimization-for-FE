@@ -3,8 +3,8 @@
     load hw2.mat; 
     n = size(Price,2);
     e = ones(n,1);
-    horizon = 2;
-    start = 250;
+    horizon = 4;
+    start = 400;
     number_rebalances = 100;
     number_of_samples = 100;
     sample_frequency = 2;
@@ -39,7 +39,7 @@
         
         % Get a scenario matrix from the nearest past date.
         % Read the csv file and calculate expected return.
-        nearest = floor(trade_date/50)*50;
+        nearest = floor(trade_date/20)*20;
         strcat(num2str(nearest),'.csv')
         scenario = csvread(strcat(num2str(nearest),'.csv'),1,1);
         mu = sum(scenario)/size(scenario,1);

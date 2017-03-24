@@ -1,5 +1,5 @@
 %------------------------------------------------------------
-% Name: optimize cvar                                       |
+% Name: optimize_cvar                                       |
 % Function: Give out weights and corresponding              |
 %     transaction cost based on all given information.      |
 %                                                           |
@@ -48,6 +48,24 @@ function [x0,x,cost] = optimize_cvar(mu0,mu,scenario,xx0,xx,trans_cost,type)
     
 end
 
+
+%------------------------------------------------------------
+% Name: con_with_trans_cost                                 |
+% Function: Provide the constraint about limiting the       |
+%       trasaction cost.                                    |
+%                                                           |
+% Input:                                                    |
+% - X: weights of assets in current period                  |
+% - mu0: return rate of risk-free asset                     |
+% - mu: return rates of risky assets                        |
+% - scenario: scenario matrix from nearest past date        |
+% - trans_cost: rate of transaction cost                    |
+% - XX: weight of all assets in the last period             |
+%                                                           |
+% Output:                                                   |
+% - c: the constraint for <=0 condition                     |
+% - ceq: the constraint for =0 condition                    |
+%------------------------------------------------------------
 function [c,ceq] = con_with_trans_cost(X,mu0,mu,trans_cost,XX)    
     A = [-1-mu0, -1-mu];
     n = length(mu);
