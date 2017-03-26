@@ -1,0 +1,327 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+
+<body>
+    <!--Step:1 Prepare a dom for ECharts which (must) has size (width & hight)-->
+    <!--Step:1 为ECharts准备一个具备大小（宽高）的Dom-->
+    <div id="main" style="height:300px;border:1px solid #ccc;padding:10px;"></div>
+    <div id="main2" style="height:200px;border:1px solid #ccc;padding:10px;"></div>
+    <div id="main3" style="height:200px;border:1px solid #ccc;padding:10px;"></div>
+    
+    <!--Step:2 Import echarts.js-->
+    <!--Step:2 引入echarts.js-->
+    <script src="js/echarts.js"></script>
+    
+    <script type="text/javascript">
+    // Step:3 conifg ECharts's path, link to echarts.js from current page.
+    // Step:3 为模块加载器配置echarts的路径，从当前页面链接到echarts.js，定义所需图表路径
+    require.config({
+        paths: {
+            echarts: './js'
+        }
+    });
+    
+    // Step:4 require echarts and use it in the callback.
+    // Step:4 动态加载echarts然后在回调函数中开始使用，注意保持按需加载结构定义图表路径
+    require(
+        [
+            'echarts',
+            'echarts/chart/bar',
+            'echarts/chart/line',
+            'echarts/chart/map'
+        ],
+        function (ec) {
+            //--- 折柱 ---
+            var axisData = ["1965","1966","1967","1968","1969","1970","1971","1972","1973","1974","1975","1976","1977","1978","1979","1980","1981","1982","1983","1984","1985","1986","1987","1988","1989","1990","1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016"];
+
+option = {
+    title : {
+        text: 'Return of Momentum Strategy'
+    },
+    tooltip : {
+        trigger: 'axis',
+        showDelay: 0,             // 显示延迟，添加显示延迟可以避免频繁切换，单位ms
+        formatter: function (params) {
+            var res = params[0].name;
+            res += '<br/>' + params[0].seriesName;
+            res += '<br/>  开盘 : ' + params[0].value[0] + '  最高 : ' + params[0].value[3];
+            res += '<br/>  收盘 : ' + params[0].value[1] + '  最低 : ' + params[0].value[2];
+            return res;
+        }
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataZoom : {show: true},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    dataZoom : {
+        y: 250,
+        show : true,
+        realtime: true,
+        start : 50,
+        end : 100
+    },
+    grid: {
+        x: 80,
+        y: 40,
+        x2:20,
+        y2:25
+    },
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : true,
+            axisTick: {onGap:false},
+            splitLine: {show:false},
+            data : axisData
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            scale:true,
+            boundaryGap: [0.05, 0.05],
+            splitArea : {show : true}
+        }
+    ],
+    series : [
+        {
+            name:'上证指数',
+            type:'line',
+            data:[ // 开盘，收盘，最低，最高
+                1.275493409,1.599614924,2.22020872,2.194524972,1.469203418,2.233698974,2.441043447,1.87369076,1.613612227,1.990979055,2.365329728,2.811748101,3.618449555,4.340619581,5.210914852,7.384720394,6.199982288,11.88289741,10.20428813,12.16899192,15.83363493,17.45955595,15.72532505,17.43485842,17.73837628,17.98878612,21.35439584,26.84535468,28.05810986,33.1893898,42.12900624,47.7967114,56.28197865,57.36366115,69.57812619,69.91795658,67.51185754,73.7981736,101.3047241,113.6378252,130.976851,156.2798058,132.8420194,98.56456625,124.3299506,163.293586,156.9207702,188.3607119,234.8033513,236.6077818,225.0281089,248.3362232
+            ]
+        },
+        {
+            name:'成交金额(万)',
+            type:'line',
+            symbol: 'none',
+            data:[]
+        },
+        {
+            name:'虚拟数据',
+            type:'bar',data:[]
+        }
+        
+    ]
+};
+            var myChart = ec.init(document.getElementById('main'));
+            myChart.setOption(option);
+
+var zrColor = require('zrender/tool/color');
+var colorList = [
+  '#ff7f50','#87cefa','#da70d6','#32cd32','#6495ed',
+  '#ff69b4','#ba55d3','#cd5c5c','#ffa500','#40e0d0'
+];
+var itemStyle = {
+    normal: {
+        color: function(params) {
+          if (params.dataIndex < 0) {
+            // for legend
+            return zrColor.lift(
+              colorList[colorList.length - 1], params.seriesIndex * 0.1
+            );
+          }
+          else {
+            // for bar
+            return zrColor.lift(
+              colorList[params.dataIndex], params.seriesIndex * 0.1
+            );
+          }
+        }
+    }
+};
+option2 = {
+    title: {
+        text: 'Return rate of different decile',
+        subtext: '数据来自国家统计局',
+        sublink: 'http://data.stats.gov.cn/search/keywordlist2?keyword=%E5%9F%8E%E9%95%87%E5%B1%85%E6%B0%91%E6%B6%88%E8%B4%B9'
+    },
+    tooltip: {
+        trigger: 'axis',
+        backgroundColor: 'rgba(255,255,255,0.7)',
+        axisPointer: {
+            type: 'shadow'
+        },
+        formatter: function(params) {
+            // for text color
+            var color = colorList[params[0].dataIndex];
+            var res = '<div style="color:' + color + '">';
+            res += '<strong>' + params[0].name + '消费（元）</strong>'
+            for (var i = 0, l = params.length; i < l; i++) {
+                res += '<br/>' + params[i].seriesName + ' : ' + params[i].value 
+            }
+            res += '</div>';
+            return res;
+        }
+    },
+    legend: {
+        x: 'right',
+        data:['decile 1','decile 4','decile 7','decile 10']
+    },
+    toolbox: {
+        show: true,
+        orient: 'vertical',
+        y: 'center',
+        feature: {
+            mark: {show: true},
+            dataView: {show: true, readOnly: false},
+            restore: {show: true},
+            saveAsImage: {show: true}
+        }
+    },
+    calculable: true,
+    grid: {
+        y: 80,
+        y2: 40,
+        x2: 40
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: axisData
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value'
+        }
+    ],
+    series: [
+        {
+            name: 'decile1',
+            type: 'bar',
+            itemStyle: itemStyle,
+            data: [0.275493409,0.254114614,0.387964495,-0.011568168,-0.330514149,0.520346976,0.092825611,-0.232422199,-0.138805474,0.233864631,0.188023411,0.188734098,0.286903885,0.199579962,0.200500241,0.417163896,-0.160431004,0.916601832,-0.141262625,0.192537075,0.301145981,0.102687793,-0.099328466,0.108712117,0.01740868,0.014116841,0.187094877,0.257134825,0.045175606,0.182880457,0.269351636,0.134532135,0.177528265,0.019218985,0.21293036,0.004884156,-0.034413177,0.093114251,0.372726711,0.121742606,0.152581464,0.193186465,-0.149973224,-0.258031708,0.261406156,0.313388972,-0.039026736,0.200355515,0.246562242,0.007684859,-0.048940372,0.103578679
+            ]
+        },
+        {
+            name: 'decile4',
+            type: 'bar',
+            itemStyle: itemStyle,
+            data: [0.298263977,0.284566725,0.386120427,0.002261828,-0.29258954,0.494171368,0.102339407,-0.214494044,-0.115020267,0.243443223,0.188223086,0.191467058,0.285565714,0.202609771,0.23934337,0.403483981,-0.147010312,0.907216844,-0.146798644,0.250302838,0.365849337,0.09748291,-0.065185,0.131860666,0.045455868,0.040772183,0.175870404,0.253538326,0.050482021,0.193522347,0.269535699,0.173724217,0.209216255,0.025469844,0.198832015,-0.013575247,0.042661564,0.055602317,0.328208424,0.140455461,0.155778767,0.195847307,-0.121951805,-0.252903813,0.202425202,0.3398674,-0.027361903,0.202357087,0.254149857,0.023926377,-0.014836489,0.090265153
+            ]
+        },
+        {
+            name: 'decile7',
+            type: 'bar',
+            itemStyle: itemStyle,
+            data: [0.43600935,0.314659437,0.417584763,0.003923213,-0.292688351,0.441264235,0.121738763,-0.252668052,-0.110646474,0.263279802,0.190551543,0.184370095,0.296032309,0.221579676,0.303250511,0.434178249,-0.165029749,0.871852158,-0.221898886,0.297631674,0.432018185,0.088668326,-0.069246581,0.135375842,0.079007186,0.059556925,0.195784651,0.288944706,0.058370754,0.211713395,0.303225304,0.156491538,0.224047254,0.047280355,0.275731171,-0.125043189,0.090097698,0.069049063,0.336167956,0.149506738,0.170164454,0.207884428,-0.102166637,-0.26003919,0.175945976,0.370456688,-0.046567925,0.19871365,0.284201809,0.02085643,-0.03031956,0.065270171
+            ]
+        },
+        {
+            name: 'decile10',
+            type: 'bar',
+            itemStyle: itemStyle,
+            data: [0.781759444,0.306965785,0.490485312,0.070850286,-0.389825525,0.434716666,0.228813246,-0.357374239,-0.097223446,0.338656247,0.196256258,0.187156971,0.365801511,0.217650697,0.422126426,0.422522783,-0.240234236,0.922895214,-0.34828079,0.26243589,0.516685103,0.022488776,-0.113709039,0.118803972,0.092191268,0.079908019,0.2380954,0.36376587,0.023526987,0.296464478,0.329036292,-0.00068109,0.209919928,0.172456936,0.614527255,-0.402713549,0.067983274,0.083063051,0.43190699,0.089890041,0.230603831,0.188292237,-0.079711467,-0.413006455,0.124152241,0.424488902,-0.112993654,0.240946729,0.350832548,-0.025008951,-0.125692211,0.027285765
+            ]
+        }
+    ]
+};
+
+            var myChart2 = ec.init(document.getElementById('main2'));
+            myChart2.setOption(option2);
+
+            option3 = {
+    tooltip : {
+        trigger: 'axis',
+        showDelay: 0             // 显示延迟，添加显示延迟可以避免频繁切换，单位ms
+    },
+    legend: {
+        y : -30,
+        data:['上证指数','成交金额(万)','虚拟数据']
+    },
+    toolbox: {
+        y : -30,
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataZoom : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    dataZoom : {
+        y:200,
+        show : true,
+        realtime: true,
+        start : 50,
+        end : 100
+    },
+    grid: {
+        x: 80,
+        y:5,
+        x2:20,
+        y2:30
+    },
+    xAxis : [
+        {
+            type : 'category',
+            position:'bottom',
+            boundaryGap : true,
+            axisTick: {onGap:false},
+            splitLine: {show:false},
+            data : axisData
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            scale:true,
+            splitNumber:3,
+            boundaryGap: [0.05, 0.05],
+            axisLabel: {
+                formatter: function (v) {
+                    return Math.round(v/10000) + ' 万'
+                }
+            },
+            splitArea : {show : true}
+        }
+    ],
+    series : [
+        {
+            name:'虚拟数据',
+            type:'bar',
+            symbol: 'none',
+            data:[0.414162283,0.297723658,0.4145212,0.014874652,-0.312894752,0.466527003,0.127004708,-0.251112484,-0.114305759,0.264804628,0.189368119,0.186905522,0.303534035,0.210756727,0.284526951,0.419708642,-0.168250486,0.893156959,-0.204518114,0.260594917,0.398864641,0.083833253,-0.077871636,0.126250118,0.060134367,0.048772646,0.193539687,0.283967112,0.050436059,0.211376855,0.291195616,0.133243501,0.210942763,0.053158457,0.294644597,-0.110172084,0.050077945,0.068216989,0.357247961,0.133204699,0.172589318,0.197860599,-0.113604625,-0.27958008,0.189092117,0.362621157,-0.046868302,0.206052263,0.276423954,0.013778601,-0.043410204,0.074309419
+            ],
+            markLine : {
+                symbol : 'none',
+                itemStyle : {
+                    normal : {
+                        color:'#1e90ff',
+                        label : {
+                            show:false
+                        }
+                    }
+                },
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        }
+    ]
+};
+
+            var myChart3 = ec.init(document.getElementById('main3'));
+            myChart3.setOption(option3);
+
+            myChart.connect([myChart2, myChart3]);
+            myChart2.connect([myChart, myChart3]);
+            myChart3.connect([myChart, myChart2]);
+        }
+    );
+    </script>
+</body>
+</html>
