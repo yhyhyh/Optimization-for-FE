@@ -8,7 +8,7 @@ import numpy as np
 
 from os import chdir
 
-chdir('D:/CodeHub/Python/NBA5420/data')
+chdir('/Users/HoneyShu/Desktop/NBA/data')
 
 df = pd.read_pickle('pickle_unstacked')
 transaction_cost = pd.read_pickle('transaction_cost')
@@ -58,7 +58,31 @@ raw_return_select = raw_return.where(select, 0.0, inplace=False)
 '''
 START: how to add boundary handling
 '''
-position_unscaled = weight_cap_unscaled.where(select, 0.0, inplace=False)
+
+# calculate the cumulative scores of each stocks
+one = np.zeros([1, raw_return.shape[1]])
+current = np.zeros([1, raw_return.shape[1]])
+score = np.zeros([raw_return.shape[0], raw_return.shape[1]])
+for i in range(raw_return.shape[0]):
+        current = select[i,:] * one + 0.5 * current
+        score[i,:] = current
+
+# compare the scores and make new selections accordingly
+select_new = np.zeros([raw_return.shape[0], raw_return.shape[1]])
+select_new[0,:] = select[0,:]
+for i in range(1, raw_return.shape[0]):
+    change = abs(select[i,:] - select[i-1,:])
+    diff = change[change > 0]
+    if diff == np.zeros([1, raw_return.shape[1]]):
+        select_new[i,:] = select_new[i-1,:]
+    else:
+        score_change = diff * score[i]
+        pool = score_change[score_change > 0]
+        new_in = np.nanpercentile(pool, q=50)
+        select_new[i,:] = score_change[score_change>new_in]
+
+
+position_unscaled = weight_cap_unscaled.where(select_new, 0.0, inplace=False)
 scale_factor = position_unscaled.sum(axis='columns')
 position_scaled = position_unscaled.div(scale_factor, axis='index')
 
