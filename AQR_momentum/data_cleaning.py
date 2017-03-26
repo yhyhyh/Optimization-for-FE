@@ -4,22 +4,6 @@ import numpy as np
 
 chdir('D:/CodeHub/Python/NBA5420/data')
 
-# build dictionary for (company name, code) pairs from old data
-# df_old = pd.read_csv('AQR_data_v0.csv', header=0, usecols=[0, 2])
-# company_code_dic = dict(zip(df_old['comnam'], df_old['code']))
-#
-# np.save('company_code_dic.npy', company_code_dic)
-# print len(company_code_dic)
-#
-# company_code_dic2 = np.load('company_code_dic.npy').item()
-# print len(company_code_dic2)
-
-# replace company name with code in new data
-
-# replace_dic = {'comnam': company_code_dic}
-# df_new = pd.read_csv('AQR_data_v1.csv', header=0, nrows=1000, sep=',')
-# df_new.replace(to_replace=replace_dic, inplace=True)
-
 # read new data
 df = pd.read_csv('AQR_data_v2.csv', header=0, sep=',', engine='c')
 df.columns.names = ['vars']
@@ -38,6 +22,8 @@ print(df.shape)
 
 df.set_index(['year', 'code'], drop=True, inplace=True)
 
+df.loc[:, 'value'] = df['market_book'] / df['market_cap']
+df.drop(['market_book'], axis=1, inplace=True)
 
 # output original data
 df.to_pickle('pickle_original')
