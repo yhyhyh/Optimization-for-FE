@@ -1,24 +1,23 @@
 #############################################################################
 # Name: fit and simulate multivariate t distribution
 # Function: fit historical return data as multivariate t distribution
-#			generate return scenarios by aggregating simulated weekly return
+#     generate return scenarios by aggregating simulated weekly return
 #
 #Input:
-#	SPDR.csv: price dataframe
+# SPDR.csv: price dataframe
 #
 #Output:
-#	$number of date$.csv: scenario matrix
-#	produce a sequence of csv file named after the days from starting date
+# $number of date$.csv: scenario matrix
+# produce a sequence of csv file named after the days from starting date
 #
 #############################################################################
 # set external paramters
 
-path = "D:/CodeHub/R/CVAR"
 filename = "SPDR.csv"
 
 num.sim = 1000
-window.len = 500
-rebalance.len = 50
+window.len = 100
+rebalance.len = 20
 set.seed(5370)
 #################################
 
@@ -39,7 +38,6 @@ loglik = rep(0, length(df))
 sim.out = matrix(0, num.sim, num.var)
 
 for (i in 0:rebalance.times){
-  
   
   end = window.len + i * rebalance.len
   start = end + 1 - window.len

@@ -1,6 +1,10 @@
-%function  multi_period
+%--------------------------------------------
+% The main entrance of back-testing system
+%--------------------------------------------
 
-    load hw2.mat; 
+function  multi_period
+
+    load Hist.mat; 
     n = size(Price,2);
     e = ones(n,1);
     horizon = 4;
@@ -143,4 +147,4 @@
     std(price2ret(hist_benchmark))
     std(price2ret(hist_mvo))
 
-%end
+end
