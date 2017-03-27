@@ -22,8 +22,7 @@ print(df.shape)
 
 df.set_index(['year', 'code'], drop=True, inplace=True)
 
-df.loc[:, 'value'] = df['market_book'] / df['market_cap']
-df.drop(['market_book'], axis=1, inplace=True)
+df.rename(columns={'market_book': 'value'}, inplace=True)
 
 # output original data
 df.to_pickle('pickle_original')

@@ -48,8 +48,6 @@ for i in range(0, 10):
 
     select = select_mom & exist_return
 
-
-
     '''
     apply selection criterion to return and weight
     '''

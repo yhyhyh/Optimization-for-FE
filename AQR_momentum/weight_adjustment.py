@@ -37,8 +37,8 @@ GOAL: compare net return series having boundary stock handling and from no bound
 OUTPUT: two net_return series, # year * # 1
 '''
 
-mom_raw_return_comparison = pd.DataFrame(index=df.index, columns=MOM)
-mom_net_return_comparison = pd.DataFrame(index=df.index, columns=MOM)
+# mom_raw_return_comparison = pd.DataFrame(index=df.index, columns=MOM)
+# mom_net_return_comparison = pd.DataFrame(index=df.index, columns=MOM)
 
 '''
 construct selection criterion based on momentum and data availability
@@ -48,35 +48,33 @@ CAUTION:    exclude stocks that have missing future returns may induce future in
 
 select_exist_future = df[future_return[1]].notnull()
 
-threshold_mom = np.nanpercentile(df[MOM[4]], q=90, axis=1)
+threshold_mom = np.nanpercentile(df[MOM[4]], q=80, axis=1)
 select_mom = df[MOM[4]].apply(lambda x: x >= threshold_mom, axis=0)
 
-select = select_mom & select_exist_future
+select = select_mom  # & select_exist_future
 
 raw_return_select = raw_return.where(select, 0.0, inplace=False)
 
 '''
-START: how to add boundary handling
+START: how to add weight adjustment
 '''
-# select_mom i + select_new i -1    -> score i
-# score i                           -> select_new i
 
-score = pd.DataFrame(0.0, index=select_mom.index, columns=select_mom.columns)
-select_new = pd.DataFrame(index=select_mom.index, columns=select_mom.columns)
+# select i   + score i      -> select_new i
+# select i+1 - select_new i -> score i + 1
+
+score = pd.DataFrame(1.0, index=select.index, columns=select.columns)
+select_new = pd.DataFrame(index=select.index, columns=select.columns)
 select_new.loc[1965, :] = select.loc[1965, :]
 
 
-for i in range(1, select_mom.shape[0]):
-    score.loc[1965 + i, :] = 0.9 * select_mom.loc[1965+i, :] + 0.1 * select_new.loc[1964+i, :]
-    threshold_score = score.loc[1965 + i, :].quantile(q=.85)
-    select_new.loc[1965+i, :] = score.loc[1965 + i, :]
-    print(str(1965 + i))
+for i in range(1, select.shape[0]):
+    temp = select.loc[1965+i, :] - select_new.loc[1964+i, :]
+    score.loc[1965 + i, :].where(temp > 0, 5.0 / 3.0, inplace=True)
+    score.loc[1965 + i, :].where(temp < 0, 3.0 / 5.0, inplace=True)
+    select_new.loc[1965+i, :] = select.loc[1965+i, :] * score.loc[1965 + i, :]
 
-'''
-END: how to add boundary handling
-'''
-
-position_unscaled = weight_cap_unscaled.where(select_new, 0.0, inplace=False)
+weight_adjustment = score.cumprod(axis=0)
+position_unscaled = (weight_cap_unscaled * weight_adjustment).where(select, 0.0, inplace=False)
 scale_factor = position_unscaled.sum(axis='columns')
 position_scaled = position_unscaled.div(scale_factor, axis='index')
 
@@ -91,7 +89,9 @@ prev_position_scaled = prev_position_unscaled.div(scale_factor, axis='index')
 prev_position_scaled.loc[1965] = 0
 prev_position_scaled.sort_index(inplace=True)
 
-
+'''
+END: how to add weight adjustment
+'''
 
 # compute the transaction by curr_position_scaled - prev_position_scaled, relative to current year return
 
@@ -104,7 +104,7 @@ cost_matrix = transaction_cost * change_in_position
 net_return_yearly_matrix = raw_return_yearly_matrix - cost_matrix
 net_return_yearly_series = net_return_yearly_matrix.sum(axis=1)
 
-net_return_yearly_series.to_csv('output/momentum_net_return_with_boundary.csv')
+net_return_yearly_series.to_csv('output/momentum_net_return_with_weight adjustment.csv')
 
 print('-----------')
 print('Hello World')
