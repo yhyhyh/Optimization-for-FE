@@ -31,9 +31,16 @@ chdir('D:/var/Google Drive/output/pics')
 # cumulative_profit = (1.0 + net_return_mom_value_size_overlay).cumprod(axis=0)
 # cumulative_profit.plot()
 
-number_of_stock_mom_value_size_overlay = pd.read_csv('4.1 number_of_stock_mom_value_size_overlay.csv')
-number_of_stock_mom_value_size_overlay.set_index(['year'], drop=True, inplace=True)
-number_of_stock_mom_value_size_overlay.plot(kind='bar')
+# number_of_stock_mom_value_size_overlay = pd.read_csv('4.1 number_of_stock_mom_value_size_overlay.csv')
+# number_of_stock_mom_value_size_overlay.set_index(['year'], drop=True, inplace=True)
+# number_of_stock_mom_value_size_overlay.plot(kind='bar')
+
+net_return_mom_value_size_overlay = pd.read_csv('4. net_return_mom_value_size_overlay.csv')
+net_return_mom_value_size_overlay.set_index(['year'], drop=True, inplace=True)
+net_return_mom_value_size_overlay.drop(['MOM+large', 'MOM+value+size'], axis=1, inplace=True)
+cumulative_profit = (1.0 + net_return_mom_value_size_overlay).cumprod(axis=0)
+cumulative_profit.plot()
+
 
 
 plt.show()

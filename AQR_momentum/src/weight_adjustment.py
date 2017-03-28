@@ -32,11 +32,6 @@ weight_cap_unscaled = df[cap]
 # fill nan caps with 1
 weight_cap_unscaled.fillna(0, inplace=True)
 
-'''
-GOAL: compare net return series having boundary stock handling and from no boundary stock handling
-OUTPUT: two net_return series, # year * # 1
-'''
-
 # mom_raw_return_comparison = pd.DataFrame(index=df.index, columns=MOM)
 # mom_net_return_comparison = pd.DataFrame(index=df.index, columns=MOM)
 
