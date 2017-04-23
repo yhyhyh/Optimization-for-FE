@@ -1,10 +1,6 @@
-%--------------------------------------------
-% The main entrance of back-testing system
-%--------------------------------------------
+%function  multi_period
 
-function  multi_period
-
-    load Hist.mat; 
+    load hw2.mat; 
     n = size(Price,2);
     e = ones(n,1);
     horizon = 4;
@@ -44,7 +40,6 @@ function  multi_period
         % Get a scenario matrix from the nearest past date.
         % Read the csv file and calculate expected return.
         nearest = floor(trade_date/20)*20;
-        strcat(num2str(nearest),'.csv')
         scenario = csvread(strcat(num2str(nearest),'.csv'),1,1);
         mu = sum(scenario)/size(scenario,1);
 
@@ -52,7 +47,10 @@ function  multi_period
         xx = x;
         
         % Call the core function to do the CVaR optimization.
-        [x0,x,cost] = optimize_cvar(mu0,mu,V,xx0,xx,trans_cost,0);
+        %[x0,x,cost] = optimize_cvar(mu0,mu,V,xx0,xx,trans_cost,0);
+        [x0, x] = cvx_cvar(scenario,ones(size(scenario,1),1),0.95,mean(mu),mu,mu0);
+        cost = 0;
+        sum(x)
         
         % Keep track of transaction costs of every step.
         acc_cost1(i) = acc_cost1(max(1,i-1))+cost;
@@ -66,7 +64,8 @@ function  multi_period
             benchmark_x-ones(n,1)/(n+1))));
         returns = (Price(trade_date+horizon-1,:)-Price(trade_date-1,:))...
             ./Price(trade_date-1,:);   
-        multiplier = 1 + mu0*x0 + returns*x;	
+        multiplier = 1 + mu0*x0 + returns*x;
+        fprintf('%f %f\n',multiplier-1, wealth);
         wealth = multiplier*wealth;
 
         if wealth<=0
@@ -147,4 +146,4 @@ function  multi_period
     std(price2ret(hist_benchmark))
     std(price2ret(hist_mvo))
 
-end
+%end
