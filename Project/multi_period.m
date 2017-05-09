@@ -48,9 +48,10 @@
         
         % Call the core function to do the CVaR optimization.
         %[x0,x,cost] = optimize_cvar(mu0,mu,V,xx0,xx,trans_cost,0);
-        [x0, x] = cvx_cvar(scenario,ones(size(scenario,1),1),0.95,mean(mu),mu,mu0);
+        [x0, x, cvar] = cvx_cvar(scenario,ones(size(scenario,1),1),0.95,mean(mu),mu,mu0);
         cost = 0;
-        sum(x)
+        [x0, x] = cvx_utilfunc(scenario,ones(size(scenario,1),1),0.95,wealth/10000,mu,mu0,cvar*1.2);
+        x
         
         % Keep track of transaction costs of every step.
         acc_cost1(i) = acc_cost1(max(1,i-1))+cost;
@@ -65,7 +66,6 @@
         returns = (Price(trade_date+horizon-1,:)-Price(trade_date-1,:))...
             ./Price(trade_date-1,:);   
         multiplier = 1 + mu0*x0 + returns*x;
-        fprintf('%f %f\n',multiplier-1, wealth);
         wealth = multiplier*wealth;
 
         if wealth<=0
