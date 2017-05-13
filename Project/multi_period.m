@@ -1,10 +1,11 @@
 %function  multi_period
 
-    load hw2.mat; 
+for gamma = 0.1:0.1:0.9
+    load price.mat; 
     n = size(Price,2);
     e = ones(n,1);
     horizon = 4;
-    start = 400;
+    start = 300;
     number_rebalances = 100;
     number_of_samples = 100;
     sample_frequency = 2;
@@ -28,7 +29,8 @@
     hist_mvo = zeros(1,length(rebalance_dates));
     acc_cost1 = zeros(1,length(rebalance_dates));
     acc_cost2 = zeros(1,length(rebalance_dates));
-
+    
+    last_nearest = 0;
     for i = 1:length(rebalance_dates)
 
         trade_date = rebalance_dates(i);
@@ -39,19 +41,23 @@
         
         % Get a scenario matrix from the nearest past date.
         % Read the csv file and calculate expected return.
-        nearest = floor(trade_date/20)*20;
+        nearest = floor(trade_date/50)*50;
         scenario = csvread(strcat(num2str(nearest),'.csv'),1,1);
         mu = sum(scenario)/size(scenario,1);
-
-        xx0 = x0;
-        xx = x;
         
-        % Call the core function to do the CVaR optimization.
-        %[x0,x,cost] = optimize_cvar(mu0,mu,V,xx0,xx,trans_cost,0);
-        [x0, x, cvar] = cvx_cvar(scenario,ones(size(scenario,1),1),0.95,mean(mu),mu,mu0);
-        cost = 0;
-        [x0, x] = cvx_utilfunc(scenario,ones(size(scenario,1),1),0.95,wealth/10000,mu,mu0,cvar*1.2);
-        x
+        if (nearest>last_nearest)
+            xx0 = x0;
+            xx = x;
+            gamma
+
+            % Call the core function to do the CVaR optimization.
+            %[x0,x,cost] = optimize_cvar(mu0,mu,V,xx0,xx,trans_cost,0);
+            [x0, x, cvar] = cvx_cvar(scenario,ones(size(scenario,1),1),0.95,mean(mu),mu,mu0);
+            cost = 0;
+            [x0, x] = cvx_utilfunc(scenario,ones(size(scenario,1),1),0.95,wealth/10000,mu,mu0,cvar*1.5,gamma);
+            
+            last_nearest = nearest;
+        end
         
         % Keep track of transaction costs of every step.
         acc_cost1(i) = acc_cost1(max(1,i-1))+cost;
@@ -92,6 +98,7 @@
     wealth = 10000;
     x0 = .3;
     x = (.7/n)*e;
+end
     
     
     for i = 1:length(rebalance_dates)
@@ -117,7 +124,7 @@
         returns = (Price(trade_date+horizon-1,:)-Price(trade_date-1,:))...
             ./Price(trade_date-1,:);
 
-        multiplier = 1 + mu0*x0 + returns*x;	
+        multiplier = 1 + mu0*x0 + returns*x;
         wealth = multiplier*wealth;
         hist_mvo(i) = wealth;
         if wealth<=0
@@ -130,11 +137,11 @@
 
     fprintf('your mvo wealth %f\n',wealth);
 
-    plot(hist_cvar);
-    hold on
-    plot(hist_benchmark);
-    hold on
-    plot(hist_mvo);
+    %plot(hist_cvar);
+    %hold on
+    %plot(hist_benchmark);
+    %hold on
+    plot(hist_mvo); hold on
     
     %plot(acc_cost1);
     %hold on

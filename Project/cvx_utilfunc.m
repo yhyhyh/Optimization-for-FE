@@ -1,4 +1,4 @@
-function [x0,x,cvar] = cvx_utilfunc(Sample_Returns,p,alpha,omega,mu,mu0,cvar_lim)
+function [x0,x,cvar] = cvx_utilfunc(Sample_Returns,p,alpha,omega,mu,mu0,cvar_lim,gamma)
 
 % Sample_Returns is a matrix whose columns correspond to assets and whose
 % rows correspond to samples (e.g., dates).
@@ -34,7 +34,7 @@ variables x(n) ell(m) y(T,m) x0
 % portfolio variables -- however you wish in the objective function and
 % additional constraints.
 
-    maximize(((omega+mu*x+x0*(1+mu0))^0.2-0.2)/0.8)
+    maximize(util_f(omega+mu*x+x0*(1+mu0),gamma))
     
     subject to
     
