@@ -1,5 +1,4 @@
 %function  multi_period
-
 for gamma = 0.1:0.1:0.9
     load price.mat; 
     n = size(Price,2);
@@ -48,7 +47,6 @@ for gamma = 0.1:0.1:0.9
         if (nearest>last_nearest)
             xx0 = x0;
             xx = x;
-            gamma
 
             % Call the core function to do the CVaR optimization.
             %[x0,x,cost] = optimize_cvar(mu0,mu,V,xx0,xx,trans_cost,0);
@@ -92,8 +90,12 @@ for gamma = 0.1:0.1:0.9
 
     end
     
-    fprintf('your cvar wealth %f\n',wealth);
-    fprintf('benchmark final wealth %f\n', benchmark_wealth);
+    %fprintf('your cvar wealth %f\n',wealth);
+    %fprintf('benchmark final wealth %f\n', benchmark_wealth);
+    fprintf('%f %f %f\n',gamma,wealth,std(price2ret(hist_cvar)))
+    plot(hist_cvar); hold on
+    legend('gamma=0.1','gamma=0.2','gamma=0.3','gamma=0.4','gamma=0.5',...
+        'gamma=0.6','gamma=0.7','gamma=0.8','gamma=0.9','Location','northwest');
     
     wealth = 10000;
     x0 = .3;
