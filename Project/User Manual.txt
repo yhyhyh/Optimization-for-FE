@@ -1,9 +1,0 @@
-User Manuscript for CVaR method back-testing system
-
-In order to run the back-test:
-(1) Excute mvt_fit_sim.R to generate a set of .csv file in the current directory. 
-	(e.g. 100.csv, 120.csv, etc)
-(2) Run multi-period.m, the module will plot the net-value series and store other 		detail information in file "result.csv"
-(3) Open "result.csv" to see net-valus's changes, transaction costs and more analysis.
-
-Having any problems ruuning the code, welcome to contact Yuheng Zhou (607-279-4276).
