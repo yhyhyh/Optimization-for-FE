@@ -1,11 +1,24 @@
-#################################
+#############################################################################
+# Name: scenario_generator_with_copula
+# Function: fit historical return data with copula and implement PC for 
+#     scalability reasons.
+#     generate return scenarios by aggregating simulated weekly return.
+#
+#Input:
+# opt_proj_data.csv: price dataframe including stocks, commodities, FX
+#     and fixed-income securities.
+#
+#Output:
+# $number of date$.csv: scenario matrix
+# produce a sequence of csv file named after the days from starting date
+#
+#############################################################################
 # set external paramters
 
-path = "D:/CodeHub/R/CVAR"
 filename = "opt_proj_data.csv"
 
 num.sim = 1000
-window.len = 500
+window.len = 300
 rebalance.len = 50
 set.seed(5370)
 num.pc = 10 # first 10 principal components usually explain most of variation
@@ -15,7 +28,6 @@ library(MASS)   # for fitting distribution
 library(copula) # for copula functions
 library(fGarch) # for standardized t density
 
-setwd(path)
 data = read.csv(filename)
 col.names = colnames(data)[-1]
 

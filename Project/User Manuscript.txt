@@ -1,7 +1,10 @@
-User Manuscript for CVaR method back-testing system
+User Manuscript for utility strategy back-testing system
 
 In order to run the back-test:
-(1) Excute mvt_fit_sim.R to generate a set of .csv file in the current directory. 
+(1) Excute scenario_generator_with_copula.R (or scenario_generator_with_copula_pca.R) to generate a set of .csv file in the current directory. 
 	(e.g. 100.csv, 120.csv, etc)
-(2) Run multi-period.m, the module will plot the net-value series and store other 		detail information in file "result.csv"
-(3) Open "result.csv" to see net-valus's changes, transaction costs and more analysis.
+(2) Run multi-period.m, the module will plot the net-value series and store other detail information in file "result.csv"
+(3) Wait about 20 minutes to see the full result. 
+	If you cannot wait for so long, change the Line 4 in multi-period.m 
+		"for gamma = 0.1:0.1:0.9" into "for gamma = 0.3"
+(4) Open "result.csv" to see net-valus's changes, transaction costs and more analysis.
